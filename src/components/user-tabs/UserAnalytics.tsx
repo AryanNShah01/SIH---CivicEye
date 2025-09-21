@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Progress } from '../ui/progress';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line, Area, AreaChart } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, AreaChart, Area } from 'recharts';
 import { TrendingUp, FileText, CheckCircle, Clock, Award, Target } from 'lucide-react';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 const monthlyData = [
   { month: 'Jan', submitted: 8, resolved: 6 },
@@ -31,6 +32,8 @@ const contributionData = [
 ];
 
 export function UserAnalytics() {
+  const { t } = useLanguage(); // Object-style translations
+
   const [animatedValues, setAnimatedValues] = useState({
     totalReports: 0,
     resolved: 0,
@@ -38,7 +41,6 @@ export function UserAnalytics() {
     points: 0
   });
 
-  // Animate numbers on mount
   useEffect(() => {
     const interval = setInterval(() => {
       setAnimatedValues(prev => ({
@@ -61,7 +63,7 @@ export function UserAnalytics() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-400 text-sm">Total Reports</p>
+                <p className="text-gray-400 text-sm">{t.totalReports}</p>
                 <p className="text-3xl font-bold text-white group-hover:text-blue-400 transition-colors">{animatedValues.totalReports}</p>
               </div>
               <div className="h-12 w-12 rounded-lg bg-blue-500/20 flex items-center justify-center group-hover:bg-blue-500/30 transition-colors">
@@ -71,7 +73,7 @@ export function UserAnalytics() {
             <div className="mt-4 flex items-center text-sm">
               <TrendingUp className="h-4 w-4 text-green-400 mr-1" />
               <span className="text-green-400">+12%</span>
-              <span className="text-gray-400 ml-1">from last month</span>
+              <span className="text-gray-400 ml-1">{t.fromLastMonth}</span>
             </div>
           </CardContent>
         </Card>
@@ -80,7 +82,7 @@ export function UserAnalytics() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-400 text-sm">Resolved</p>
+                <p className="text-gray-400 text-sm">{t.resolved}</p>
                 <p className="text-3xl font-bold text-white group-hover:text-green-400 transition-colors">{animatedValues.resolved}</p>
               </div>
               <div className="h-12 w-12 rounded-lg bg-green-500/20 flex items-center justify-center group-hover:bg-green-500/30 transition-colors">
@@ -89,7 +91,7 @@ export function UserAnalytics() {
             </div>
             <div className="mt-4 flex items-center text-sm">
               <span className="text-green-400">83.3%</span>
-              <span className="text-gray-400 ml-1">resolution rate</span>
+              <span className="text-gray-400 ml-1">{t.resolutionRate}</span>
             </div>
           </CardContent>
         </Card>
@@ -98,7 +100,7 @@ export function UserAnalytics() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-400 text-sm">Pending</p>
+                <p className="text-gray-400 text-sm">{t.pending}</p>
                 <p className="text-3xl font-bold text-white group-hover:text-yellow-400 transition-colors">{animatedValues.pending}</p>
               </div>
               <div className="h-12 w-12 rounded-lg bg-yellow-500/20 flex items-center justify-center group-hover:bg-yellow-500/30 transition-colors">
@@ -107,7 +109,7 @@ export function UserAnalytics() {
             </div>
             <div className="mt-4 flex items-center text-sm">
               <span className="text-yellow-400">16.7%</span>
-              <span className="text-gray-400 ml-1">pending review</span>
+              <span className="text-gray-400 ml-1">{t.pendingReview}</span>
             </div>
           </CardContent>
         </Card>
@@ -116,7 +118,7 @@ export function UserAnalytics() {
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-gray-400 text-sm">Total Points</p>
+                <p className="text-gray-400 text-sm">{t.totalPoints}</p>
                 <p className="text-3xl font-bold text-white group-hover:text-purple-400 transition-colors">{animatedValues.points.toLocaleString()}</p>
               </div>
               <div className="h-12 w-12 rounded-lg bg-purple-500/20 flex items-center justify-center group-hover:bg-purple-500/30 transition-colors">
@@ -125,8 +127,8 @@ export function UserAnalytics() {
             </div>
             <div className="mt-4 flex items-center text-sm">
               <Target className="h-4 w-4 text-purple-400 mr-1" />
-              <span className="text-purple-400">Rank #23</span>
-              <span className="text-gray-400 ml-1">this month</span>
+              <span className="text-purple-400">{t.rank} #23</span>
+              <span className="text-gray-400 ml-1">{t.thisMonth}</span>
             </div>
           </CardContent>
         </Card>
@@ -139,7 +141,7 @@ export function UserAnalytics() {
           <CardHeader>
             <CardTitle className="text-white flex items-center">
               <BarChart className="h-5 w-5 mr-2 text-blue-400" />
-              Monthly Report Activity
+              {t.monthlyReportActivity}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -156,8 +158,8 @@ export function UserAnalytics() {
                     backdropFilter: 'blur(12px)'
                   }} 
                 />
-                <Bar dataKey="submitted" fill="#3B82F6" name="Submitted" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="resolved" fill="#10B981" name="Resolved" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="submitted" fill="#3B82F6" name={t.submitted} radius={[4, 4, 0, 0]} />
+                <Bar dataKey="resolved" fill="#10B981" name={t.resolved} radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
@@ -168,7 +170,7 @@ export function UserAnalytics() {
           <CardHeader>
             <CardTitle className="text-white flex items-center">
               <Target className="h-5 w-5 mr-2 text-purple-400" />
-              Issue Categories
+              {t.issueCategories}
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -206,7 +208,7 @@ export function UserAnalytics() {
         <CardHeader>
           <CardTitle className="text-white flex items-center">
             <TrendingUp className="h-5 w-5 mr-2 text-green-400" />
-            Weekly Contribution Trend
+            {t.weeklyContributionTrend}
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -241,67 +243,6 @@ export function UserAnalytics() {
           </ResponsiveContainer>
         </CardContent>
       </Card>
-
-      {/* Progress Bars */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Card className="bg-black/20 backdrop-blur-xl border border-white/10 hover:border-white/20 transition-all duration-300">
-          <CardHeader>
-            <CardTitle className="text-white">Monthly Goals</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <div className="flex justify-between text-sm mb-2">
-                <span className="text-gray-400">Reports Target</span>
-                <span className="text-white">25/30</span>
-              </div>
-              <Progress value={83} className="h-2 bg-gray-700" />
-            </div>
-            <div>
-              <div className="flex justify-between text-sm mb-2">
-                <span className="text-gray-400">Community Engagement</span>
-                <span className="text-white">18/20</span>
-              </div>
-              <Progress value={90} className="h-2 bg-gray-700" />
-            </div>
-            <div>
-              <div className="flex justify-between text-sm mb-2">
-                <span className="text-gray-400">Points Goal</span>
-                <span className="text-white">1240/1500</span>
-              </div>
-              <Progress value={82} className="h-2 bg-gray-700" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-black/20 backdrop-blur-xl border border-white/10 hover:border-white/20 transition-all duration-300">
-          <CardHeader>
-            <CardTitle className="text-white">Achievement Progress</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div>
-              <div className="flex justify-between text-sm mb-2">
-                <span className="text-gray-400">Civic Hero Badge</span>
-                <span className="text-white">8/10 reports</span>
-              </div>
-              <Progress value={80} className="h-2 bg-gray-700" />
-            </div>
-            <div>
-              <div className="flex justify-between text-sm mb-2">
-                <span className="text-gray-400">Community Champion</span>
-                <span className="text-white">15/25 upvotes</span>
-              </div>
-              <Progress value={60} className="h-2 bg-gray-700" />
-            </div>
-            <div>
-              <div className="flex justify-between text-sm mb-2">
-                <span className="text-gray-400">Problem Solver</span>
-                <span className="text-white">12/15 resolved</span>
-              </div>
-              <Progress value={80} className="h-2 bg-gray-700" />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
     </div>
   );
 }

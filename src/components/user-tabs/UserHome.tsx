@@ -33,8 +33,49 @@ const getPriorityColor = (priority: string) => {
   }
 };
 
+// Helper functions for localStorage voting
+const hasVoted = (reportId: number): boolean => {
+  if (typeof window === 'undefined') return false;
+  const votedReports = JSON.parse(localStorage.getItem('votedReports') || '[]');
+  return votedReports.includes(reportId);
+};
+
+const setVoted = (reportId: number) => {
+  if (typeof window === 'undefined') return;
+  const votedReports = JSON.parse(localStorage.getItem('votedReports') || '[]');
+  if (!votedReports.includes(reportId)) {
+    votedReports.push(reportId);
+    localStorage.setItem('votedReports', JSON.stringify(votedReports));
+  }
+};
+
+const getVoteCount = (reportId: number): number => {
+  if (typeof window === 'undefined') return 0;
+  const voteCounts = JSON.parse(localStorage.getItem('voteCounts') || '{}');
+  return voteCounts[reportId] || 0;
+};
+
+const setVoteCount = (reportId: number, count: number) => {
+  if (typeof window === 'undefined') return;
+  const voteCounts = JSON.parse(localStorage.getItem('voteCounts') || '{}');
+  voteCounts[reportId] = count;
+  localStorage.setItem('voteCounts', JSON.stringify(voteCounts));
+};
+
 export function UserHome() {
   const { t, language } = useLanguage();
+  const [votedReports, setVotedReports] = React.useState<number[]>([]);
+  const [voteCounts, setVoteCounts] = React.useState<{[key: number]: number}>({});
+
+  // Initialize from localStorage
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const voted = JSON.parse(localStorage.getItem('votedReports') || '[]');
+      const counts = JSON.parse(localStorage.getItem('voteCounts') || '{}');
+      setVotedReports(voted);
+      setVoteCounts(counts);
+    }
+  }, []);
 
   const recentReports = [
     {
@@ -96,7 +137,7 @@ export function UserHome() {
       statusText: language === 'hi' ? "प्रगति में" : t.active,
       upvotes: 65,
       timeAgo: language === 'hi' ? "8 घंटे पहले" : "8 hours ago",
-      image: "https://images.unsplash.com/photo-1708561159079-d4d9a40881f0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx3YXRlciUyMHBpcGUlMjBsZWFrJTIwYnVyc3R8ZW58MXx8fHwxNzU4MjAyMzIxfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      image: "https://images.unsplash.com/photo-1708561159079-d4d9a40881f0?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx3YXRlciUyMHBpcGU%3D&ixlib=rb-4.1.0&q=80&w=1080",
       priority: "high",
       ward: language === 'hi' ? "L वार्ड" : "L Ward",
       reportedBy: t.names.users[3]
@@ -104,11 +145,50 @@ export function UserHome() {
   ];
 
   const handleUpvote = (reportId: number) => {
-    console.log(`Upvoted report ${reportId}`);
+    if (votedReports.includes(reportId)) return;
+    
+    const currentCount = voteCounts[reportId] || recentReports.find(r => r.id === reportId)?.upvotes || 0;
+    const newCount = currentCount + 1;
+    
+    // Update state
+    setVoteCounts(prev => ({ ...prev, [reportId]: newCount }));
+    setVotedReports(prev => [...prev, reportId]);
+    
+    // Update localStorage
+    setVoteCount(reportId, newCount);
+    setVoted(reportId);
   };
 
-  const handleShare = (reportId: number) => {
-    console.log(`Shared report ${reportId}`);
+  const handleShare = async (reportId: number) => {
+    const report = recentReports.find(r => r.id === reportId);
+    if (!report) return;
+    
+    const shareData = {
+      title: report.title,
+      text: report.description,
+      url: window.location.href,
+    };
+    
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(shareData.url);
+        alert(language === 'hi' ? 'लिंक कॉपी हो गया!' : 'Link copied to clipboard!');
+      }
+    } catch (err) {
+      console.log('Share failed:', err);
+    }
+  };
+
+  // Get current vote count for a report
+  const getCurrentVotes = (reportId: number) => {
+    return voteCounts[reportId] || recentReports.find(r => r.id === reportId)?.upvotes || 0;
+  };
+
+  // Check if user has voted for a report
+  const hasUserVoted = (reportId: number) => {
+    return votedReports.includes(reportId);
   };
 
   return (
@@ -126,7 +206,7 @@ export function UserHome() {
           <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between space-y-4 lg:space-y-0">
             <div className="space-y-2">
               <CardTitle className="text-2xl lg:text-3xl bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent animate-pulse">
-                {t.welcomeBack}, {t.names.users[0]},{t.names.users[1]}! 🙏
+                {t.welcomeBack}, {t.names.users[0].split(' ')[0]}! 🙏
               </CardTitle>
               <p className="text-gray-400 text-base lg:text-lg">
                 {language === 'hi' ? 'आपके क्षेत्र की नवीनतम रिपोर्ट्स के साथ अपडेट रहें' : 'Stay updated with latest reports from your area'}
@@ -201,93 +281,103 @@ export function UserHome() {
         </div>
         
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-          {recentReports.map((report, index) => (
-            <Card 
-              key={report.id} 
-              className="glass-card hover:glass-card-hover neon-glow-hover transition-all duration-500 group cursor-pointer overflow-hidden"
-              style={{ animationDelay: `${index * 100}ms` }}
-            >
-              <CardContent className="p-0">
-                <div className="relative h-48 sm:h-56 overflow-hidden rounded-t-lg">
-                  <ImageWithFallback
-                    src={report.image}
-                    alt={report.title}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                  />
-                  
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                  
-                  {/* Status and Ward badges */}
-                  <div className="absolute top-4 right-4 space-y-2">
-                    <Badge className={`${getStatusColor(report.status)} backdrop-blur-sm`}>
-                      {getStatusIcon(report.status)}
-                      <span className="ml-1">{report.statusText}</span>
-                    </Badge>
-                    <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/30 backdrop-blur-sm">
-                      {report.ward}
-                    </Badge>
-                  </div>
-                  
-                  {/* Priority indicator */}
-                  <div className="absolute top-4 left-4">
-                    <div className={`w-4 h-4 rounded-full ${getPriorityColor(report.priority)}`}>
-                      <div className="w-2 h-2 bg-white rounded-full absolute top-1 left-1 animate-pulse"></div>
-                    </div>
-                  </div>
-                  
-                  <div className="absolute inset-0 border-2 border-transparent group-hover:border-blue-400/50 rounded-t-lg transition-all duration-500"></div>
-                </div>
-                
-                <div className="p-4 sm:p-6 space-y-4">
-                  <div className="space-y-2">
-                    <h3 className="text-lg lg:text-xl font-semibold text-white group-hover:text-blue-400 transition-colors">
-                      {report.title}
-                    </h3>
-                    <p className="text-gray-400 text-sm lg:text-base line-clamp-2">
-                      {report.description}
-                    </p>
-                    <p className="text-xs text-gray-500">
-                      {language === 'hi' ? 'रिपोर्ट किया गया:' : 'Reported by:'} {report.reportedBy}
-                    </p>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <div className="flex items-center text-sm text-gray-400">
-                      <MapPin className="h-4 w-4 mr-2 text-purple-400" />
-                      <span className="font-medium">{report.location}</span>
-                    </div>
-                  </div>
-                  
-                  <div className="flex items-center justify-between pt-3 border-t border-white/10">
-                    <div className="flex items-center space-x-3">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleUpvote(report.id)}
-                        className="text-gray-400 hover:text-blue-400 hover:bg-blue-500/10 neon-glow-hover transition-all duration-300 hover:scale-105"
-                      >
-                        <ArrowUp className="h-4 w-4 mr-1" />
-                        <span className="font-semibold">{report.upvotes}</span>
-                      </Button>
-                      
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleShare(report.id)}
-                        className="text-gray-400 hover:text-purple-400 hover:bg-purple-500/10 neon-glow-hover transition-all duration-300 hover:scale-105"
-                      >
-                        <Share2 className="h-4 w-4" />
-                      </Button>
+          {recentReports.map((report, index) => {
+            const currentVotes = getCurrentVotes(report.id);
+            const userVoted = hasUserVoted(report.id);
+            
+            return (
+              <Card 
+                key={report.id} 
+                className="glass-card hover:glass-card-hover neon-glow-hover transition-all duration-500 group cursor-pointer overflow-hidden"
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
+                <CardContent className="p-0">
+                  <div className="relative h-48 sm:h-56 overflow-hidden rounded-t-lg">
+                    <ImageWithFallback
+                      src={report.image}
+                      alt={report.title}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                    />
+                    
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                    
+                    {/* Status and Ward badges */}
+                    <div className="absolute top-4 right-4 space-y-2">
+                      <Badge className={`${getStatusColor(report.status)} backdrop-blur-sm`}>
+                        {getStatusIcon(report.status)}
+                        <span className="ml-1">{report.statusText}</span>
+                      </Badge>
+                      <Badge className="bg-blue-500/20 text-blue-300 border-blue-500/30 backdrop-blur-sm">
+                        {report.ward}
+                      </Badge>
                     </div>
                     
-                    <div className="text-right">
-                      <div className="text-xs text-gray-500">{report.timeAgo}</div>
+                    {/* Priority indicator */}
+                    <div className="absolute top-4 left-4">
+                      <div className={`w-4 h-4 rounded-full ${getPriorityColor(report.priority)}`}>
+                        <div className="w-2 h-2 bg-white rounded-full absolute top-1 left-1 animate-pulse"></div>
+                      </div>
+                    </div>
+                    
+                    <div className="absolute inset-0 border-2 border-transparent group-hover:border-blue-400/50 rounded-t-lg transition-all duration-500"></div>
+                  </div>
+                  
+                  <div className="p-4 sm:p-6 space-y-4">
+                    <div className="space-y-2">
+                      <h3 className="text-lg lg:text-xl font-semibold text-white group-hover:text-blue-400 transition-colors">
+                        {report.title}
+                      </h3>
+                      <p className="text-gray-400 text-sm lg:text-base line-clamp-2">
+                        {report.description}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {language === 'hi' ? 'रिपोर्ट किया गया:' : 'Reported by:'} {report.reportedBy}
+                      </p>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <div className="flex items-center text-sm text-gray-400">
+                        <MapPin className="h-4 w-4 mr-2 text-purple-400" />
+                        <span className="font-medium">{report.location}</span>
+                      </div>
+                    </div>
+                    
+                    <div className="flex items-center justify-between pt-3 border-t border-white/10">
+                      <div className="flex items-center space-x-3">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleUpvote(report.id)}
+                          disabled={userVoted}
+                          className={`text-gray-400 transition-all duration-300 ${
+                            userVoted 
+                              ? 'text-blue-400 bg-blue-500/20 cursor-not-allowed' 
+                              : 'hover:text-blue-400 hover:bg-blue-500/10 neon-glow-hover hover:scale-105'
+                          }`}
+                        >
+                          <ArrowUp className="h-4 w-4 mr-1" />
+                          <span className="font-semibold">{currentVotes}</span>
+                        </Button>
+                        
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleShare(report.id)}
+                          className="text-gray-400 hover:text-purple-400 hover:bg-purple-500/10 neon-glow-hover transition-all duration-300 hover:scale-105"
+                        >
+                          <Share2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                      
+                      <div className="text-right">
+                        <div className="text-xs text-gray-500">{report.timeAgo}</div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       </div>
       

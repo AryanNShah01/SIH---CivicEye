@@ -22,12 +22,21 @@ export default function App() {
   };
 
   return (
-    <LanguageProvider>
-      {currentDashboard === 'user' ? (
-        <UserDashboard onSwitchDashboard={setCurrentDashboard} isDarkMode={isDarkMode} onToggleDarkMode={toggleDarkMode} />
-      ) : (
-        <GovernmentDashboard onSwitchDashboard={setCurrentDashboard} isDarkMode={isDarkMode} onToggleDarkMode={toggleDarkMode} />
-      )}
-    </LanguageProvider>
-  );
+  <>
+    {currentDashboard === 'user' ? (
+      <UserDashboard
+        onSwitchDashboard={setCurrentDashboard}
+        isDarkMode={isDarkMode}
+        onToggleDarkMode={toggleDarkMode}
+      />
+    ) : (
+      <GovernmentDashboard
+        onSwitchDashboard={setCurrentDashboard}
+        isDarkMode={isDarkMode}
+        onToggleDarkMode={toggleDarkMode}
+      />
+    )}
+  </>
+);
+
 }
