@@ -33,6 +33,7 @@ import { ChatBot } from "./ChatBot";
 import { DynamicBackground } from "./DynamicBackground";
 import { LanguageToggle } from "./LanguageToggle";
 import { useLanguage } from "../contexts/LanguageContext";
+import { LogOut } from "lucide-react";
 
 interface UserDashboardProps {
   onSwitchDashboard: (dashboard: "user" | "government") => void;
@@ -156,6 +157,23 @@ export function UserDashboard({
                 >
                   <Building2 className="h-4 w-4" />
                 </Button>
+
+                {/* Logout button */}
+                {/* Logout Button */}
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => {
+                    localStorage.removeItem("authToken");
+                    sessionStorage.clear();
+                    window.location.href = "/login";
+                  }}
+                  className="transition-all duration-300 hover:scale-105 flex items-center gap-2"
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span className="hidden sm:inline">Logout</span>
+                </Button>
+
               </div>
             </div>
           </div>
