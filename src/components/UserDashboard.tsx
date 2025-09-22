@@ -160,7 +160,7 @@ export function UserDashboard({
 
                 {/* Logout button */}
                 {/* Logout Button */}
-                <Button
+                {/* <Button
                   variant="destructive"
                   size="sm"
                   onClick={() => {
@@ -172,7 +172,24 @@ export function UserDashboard({
                 >
                   <LogOut className="h-4 w-4" />
                   <span className="hidden sm:inline">Logout</span>
-                </Button>
+                </Button> */}
+                
+<Button
+  variant="destructive"
+  size="sm"
+  onClick={() => {
+    localStorage.removeItem("authToken");
+    sessionStorage.clear();
+    // Use window.location.replace instead of href
+    window.location.replace("/");
+    // Or if you have a specific login route configured:
+    // window.location.replace("/login");
+  }}
+  className="transition-all duration-300 hover:scale-105 flex items-center gap-2"
+>
+  <LogOut className="h-4 w-4" />
+  <span className="hidden sm:inline">Logout</span>
+</Button>
 
               </div>
             </div>
