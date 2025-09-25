@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Progress } from '../ui/progress';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, AreaChart, Area } from 'recharts';
-import { TrendingUp, FileText, CheckCircle, Clock, Award, Target } from 'lucide-react';
+import { 
+  BarChart as ReBarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, 
+  PieChart, Pie, Cell, AreaChart, Area 
+} from 'recharts';
+import { 
+  TrendingUp, FileText, CheckCircle, Clock, Award, Target, BarChart as BarChartIcon 
+} from 'lucide-react';
 import { useLanguage } from '../../contexts/LanguageContext';
 
 const monthlyData = [
@@ -31,29 +36,22 @@ const contributionData = [
   { week: 'Week 6', points: 38 }
 ];
 
+// Constant data values
+const STATS_DATA = {
+  totalReports: 89, // Sum of resolved (78) + pending (11)
+  resolved: 78,
+  pending: 11, // 89 total - 78 resolved = 11 pending
+  points: 2840,
+  rank: 1
+};
+
 export function UserAnalytics() {
-  const { t } = useLanguage(); // Object-style translations
+  const { t } = useLanguage();
 
-  const [animatedValues, setAnimatedValues] = useState({
-    totalReports: 0,
-    resolved: 0,
-    pending: 0,
-    points: 0
-  });
+  // Remove animation and use constant values directly
+  const [animatedValues] = useState(STATS_DATA);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setAnimatedValues(prev => ({
-        totalReports: prev.totalReports < 42 ? prev.totalReports + 1 : 42,
-        resolved: prev.resolved < 35 ? prev.resolved + 1 : 35,
-        pending: prev.pending < 7 ? prev.pending + 1 : 7,
-        points: prev.points < 1240 ? prev.points + 30 : 1240
-      }));
-    }, 50);
-
-    setTimeout(() => clearInterval(interval), 2000);
-    return () => clearInterval(interval);
-  }, []);
+  // Remove the useEffect animation completely
 
   return (
     <div className="space-y-6">
@@ -90,7 +88,7 @@ export function UserAnalytics() {
               </div>
             </div>
             <div className="mt-4 flex items-center text-sm">
-              <span className="text-green-400">83.3%</span>
+              <span className="text-green-400">87.6%</span>
               <span className="text-gray-400 ml-1">{t.resolutionRate}</span>
             </div>
           </CardContent>
@@ -108,7 +106,7 @@ export function UserAnalytics() {
               </div>
             </div>
             <div className="mt-4 flex items-center text-sm">
-              <span className="text-yellow-400">16.7%</span>
+              <span className="text-yellow-400">12.4%</span>
               <span className="text-gray-400 ml-1">{t.pendingReview}</span>
             </div>
           </CardContent>
@@ -127,7 +125,7 @@ export function UserAnalytics() {
             </div>
             <div className="mt-4 flex items-center text-sm">
               <Target className="h-4 w-4 text-purple-400 mr-1" />
-              <span className="text-purple-400">{t.rank} #23</span>
+              <span className="text-purple-400">{t.rank} #{animatedValues.rank}</span>
               <span className="text-gray-400 ml-1">{t.thisMonth}</span>
             </div>
           </CardContent>
@@ -140,13 +138,13 @@ export function UserAnalytics() {
         <Card className="bg-black/20 backdrop-blur-xl border border-white/10 hover:border-white/20 transition-all duration-300">
           <CardHeader>
             <CardTitle className="text-white flex items-center">
-              <BarChart className="h-5 w-5 mr-2 text-blue-400" />
+              <BarChartIcon className="h-5 w-5 mr-2 text-blue-400" />
               {t.monthlyReportActivity}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={monthlyData}>
+              <ReBarChart data={monthlyData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                 <XAxis dataKey="month" stroke="#9CA3AF" />
                 <YAxis stroke="#9CA3AF" />
@@ -160,7 +158,7 @@ export function UserAnalytics() {
                 />
                 <Bar dataKey="submitted" fill="#3B82F6" name={t.submitted} radius={[4, 4, 0, 0]} />
                 <Bar dataKey="resolved" fill="#10B981" name={t.resolved} radius={[4, 4, 0, 0]} />
-              </BarChart>
+              </ReBarChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>

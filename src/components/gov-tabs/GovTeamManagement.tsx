@@ -161,30 +161,32 @@ export function GovTeamManagement() {
       {/* Header */}
       <Card className="bg-black/20 backdrop-blur-xl border border-white/10 hover:border-white/20 transition-all duration-300">
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex-1">
               <CardTitle className="text-white flex items-center">
                 <Users className="h-5 w-5 mr-2 text-indigo-400" />
                 Team Management
               </CardTitle>
               <p className="text-gray-400 text-sm mt-1">Monitor team performance and manage workload distribution</p>
             </div>
-            <div className="flex space-x-2">
+            <div className="flex flex-wrap gap-2 sm:flex-nowrap sm:space-x-2">
               <Button
                 variant="outline"
                 size="sm"
-                className="border-indigo-500/50 text-indigo-300 hover:bg-indigo-500/20"
+                className="border-indigo-500/50 text-indigo-300 hover:bg-indigo-500/20 flex-1 sm:flex-none"
               >
-                <UserPlus className="h-4 w-4 mr-2" />
-                Add Member
+                <UserPlus className="h-4 w-4 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">Add Member</span>
+                <span className="sm:hidden">Add</span>
               </Button>
               <Button
                 variant="outline"
                 size="sm"
-                className="border-gray-500/50 text-gray-300 hover:bg-gray-500/20"
+                className="border-gray-500/50 text-gray-300 hover:bg-gray-500/20 flex-1 sm:flex-none"
               >
-                <Settings className="h-4 w-4 mr-2" />
-                Settings
+                <Settings className="h-4 w-4 mr-1 sm:mr-2" />
+                <span className="hidden sm:inline">Settings</span>
+                <span className="sm:hidden">Settings</span>
               </Button>
             </div>
           </div>
@@ -203,35 +205,35 @@ export function GovTeamManagement() {
             }`}
             onClick={() => setSelectedTeam(selectedTeam === team.id ? null : team.id)}
           >
-            <CardContent className="p-6">
+            <CardContent className="p-4 sm:p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-white font-semibold">{team.name}</h3>
-                <Badge className={getStatusColor(team.status)}>
+                <h3 className="text-white font-semibold text-sm sm:text-base">{team.name}</h3>
+                <Badge className={`text-xs ${getStatusColor(team.status)}`}>
                   {team.status}
                 </Badge>
               </div>
               
               <div className="space-y-3">
                 <div className="flex items-center space-x-2">
-                  <Avatar className="w-8 h-8">
+                  <Avatar className="w-6 h-6 sm:w-8 sm:h-8">
                     <AvatarImage src={team.lead.avatar} />
-                    <AvatarFallback>{team.lead.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                    <AvatarFallback className="text-xs sm:text-sm">{team.lead.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
                   </Avatar>
                   <div>
-                    <div className="text-sm text-white">{team.lead.name}</div>
+                    <div className="text-xs sm:text-sm text-white">{team.lead.name}</div>
                     <div className="text-xs text-gray-400">Team Lead</div>
                   </div>
                 </div>
                 
                 <div className="space-y-2">
-                  <div className="flex justify-between text-sm">
+                  <div className="flex justify-between text-xs sm:text-sm">
                     <span className="text-gray-400">Workload</span>
                     <span className="text-white">{team.currentLoad}/{team.maxCapacity}</span>
                   </div>
-                  <Progress value={(team.currentLoad / team.maxCapacity) * 100} className="h-2 bg-gray-700" />
+                  <Progress value={(team.currentLoad / team.maxCapacity) * 100} className="h-1 sm:h-2 bg-gray-700" />
                 </div>
 
-                <div className="flex justify-between text-sm">
+                <div className="flex justify-between text-xs sm:text-sm">
                   <span className="text-gray-400">Efficiency</span>
                   <span className={getEfficiencyColor(team.efficiency)}>{team.efficiency}%</span>
                 </div>
@@ -259,8 +261,8 @@ export function GovTeamManagement() {
         {/* Weekly Performance */}
         <Card className="bg-black/20 backdrop-blur-xl border border-white/10 hover:border-white/20 transition-all duration-300">
           <CardHeader>
-            <CardTitle className="text-white flex items-center">
-              <BarChart className="h-5 w-5 mr-2 text-green-400" />
+            <CardTitle className="text-white flex items-center text-sm sm:text-base">
+              <BarChart className="h-4 w-4 sm:h-5 sm:w-5 mr-2 text-green-400" />
               Weekly Team Performance
             </CardTitle>
           </CardHeader>
@@ -290,8 +292,8 @@ export function GovTeamManagement() {
         {/* Workload Trend */}
         <Card className="bg-black/20 backdrop-blur-xl border border-white/10 hover:border-white/20 transition-all duration-300">
           <CardHeader>
-            <CardTitle className="text-white flex items-center">
-              <TrendingUp className="h-5 w-5 mr-2 text-blue-400" />
+            <CardTitle className="text-white flex items-center text-sm sm:text-base">
+              <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 mr-2 text-blue-400" />
               Daily Workload Trend
             </CardTitle>
           </CardHeader>
@@ -326,16 +328,16 @@ export function GovTeamManagement() {
       {selectedTeamData && (
         <Card className="bg-black/20 backdrop-blur-xl border border-indigo-500/30 hover:border-indigo-500/50 transition-all duration-300">
           <CardHeader>
-            <div className="flex items-center justify-between">
-              <CardTitle className="text-white flex items-center">
-                <Activity className="h-5 w-5 mr-2 text-indigo-400" />
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <CardTitle className="text-white flex items-center text-sm sm:text-base">
+                <Activity className="h-4 w-4 sm:h-5 sm:w-5 mr-2 text-indigo-400" />
                 {selectedTeamData.name} - Detailed View
               </CardTitle>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setSelectedTeam(null)}
-                className="text-gray-400 hover:text-white"
+                className="text-gray-400 hover:text-white self-end sm:self-auto"
               >
                 ✕
               </Button>
@@ -343,89 +345,89 @@ export function GovTeamManagement() {
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Team Lead Details */}
-            <div className="p-4 bg-indigo-500/10 rounded-lg border border-indigo-500/20">
-              <h3 className="text-white font-semibold mb-3 flex items-center">
-                <Award className="h-4 w-4 mr-2 text-indigo-400" />
+            <div className="p-3 sm:p-4 bg-indigo-500/10 rounded-lg border border-indigo-500/20">
+              <h3 className="text-white font-semibold mb-3 flex items-center text-sm sm:text-base">
+                <Award className="h-3 w-3 sm:h-4 sm:w-4 mr-2 text-indigo-400" />
                 Team Lead
               </h3>
-              <div className="flex items-center space-x-4">
-                <Avatar className="w-16 h-16">
+              <div className="flex items-center space-x-3 sm:space-x-4">
+                <Avatar className="w-12 h-12 sm:w-16 sm:h-16">
                   <AvatarImage src={selectedTeamData.lead.avatar} />
-                  <AvatarFallback className="text-lg">{selectedTeamData.lead.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                  <AvatarFallback className="text-sm sm:text-lg">{selectedTeamData.lead.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
                 </Avatar>
-                <div>
-                  <h4 className="text-white font-medium">{selectedTeamData.lead.name}</h4>
-                  <div className="flex items-center text-sm text-gray-400 mt-1">
-                    <Mail className="h-3 w-3 mr-1" />
-                    {selectedTeamData.lead.email}
+                <div className="flex-1 min-w-0">
+                  <h4 className="text-white font-medium text-sm sm:text-base truncate">{selectedTeamData.lead.name}</h4>
+                  <div className="flex items-center text-xs sm:text-sm text-gray-400 mt-1 truncate">
+                    <Mail className="h-3 w-3 mr-1 flex-shrink-0" />
+                    <span className="truncate">{selectedTeamData.lead.email}</span>
                   </div>
-                  <div className="flex items-center text-sm text-gray-400 mt-1">
-                    <Phone className="h-3 w-3 mr-1" />
-                    {selectedTeamData.lead.phone}
+                  <div className="flex items-center text-xs sm:text-sm text-gray-400 mt-1 truncate">
+                    <Phone className="h-3 w-3 mr-1 flex-shrink-0" />
+                    <span className="truncate">{selectedTeamData.lead.phone}</span>
                   </div>
                 </div>
               </div>
             </div>
 
             {/* Performance Metrics */}
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              <div className="p-4 bg-black/30 rounded-lg border border-white/10">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4">
+              <div className="p-2 sm:p-4 bg-black/30 rounded-lg border border-white/10">
                 <div className="flex items-center justify-between">
                   <div>
-                    <div className="text-gray-400 text-sm">Recent Work</div>
-                    <div className="text-2xl font-bold text-white">{selectedTeamData.recentWork}</div>
+                    <div className="text-gray-400 text-xs sm:text-sm">Recent Work</div>
+                    <div className="text-lg sm:text-2xl font-bold text-white">{selectedTeamData.recentWork}</div>
                   </div>
-                  <CheckCircle className="h-8 w-8 text-green-400" />
+                  <CheckCircle className="h-5 w-5 sm:h-8 sm:w-8 text-green-400" />
                 </div>
               </div>
-              <div className="p-4 bg-black/30 rounded-lg border border-white/10">
+              <div className="p-2 sm:p-4 bg-black/30 rounded-lg border border-white/10">
                 <div className="flex items-center justify-between">
                   <div>
-                    <div className="text-gray-400 text-sm">Avg Resolution</div>
-                    <div className="text-2xl font-bold text-white">{selectedTeamData.avgResolutionTime}</div>
+                    <div className="text-gray-400 text-xs sm:text-sm">Avg Resolution</div>
+                    <div className="text-lg sm:text-2xl font-bold text-white">{selectedTeamData.avgResolutionTime}</div>
                   </div>
-                  <Clock className="h-8 w-8 text-blue-400" />
+                  <Clock className="h-5 w-5 sm:h-8 sm:w-8 text-blue-400" />
                 </div>
               </div>
-              <div className="p-4 bg-black/30 rounded-lg border border-white/10">
+              <div className="p-2 sm:p-4 bg-black/30 rounded-lg border border-white/10">
                 <div className="flex items-center justify-between">
                   <div>
-                    <div className="text-gray-400 text-sm">Efficiency</div>
-                    <div className={`text-2xl font-bold ${getEfficiencyColor(selectedTeamData.efficiency)}`}>
+                    <div className="text-gray-400 text-xs sm:text-sm">Efficiency</div>
+                    <div className={`text-lg sm:text-2xl font-bold ${getEfficiencyColor(selectedTeamData.efficiency)}`}>
                       {selectedTeamData.efficiency}%
                     </div>
                   </div>
-                  <TrendingUp className="h-8 w-8 text-purple-400" />
+                  <TrendingUp className="h-5 w-5 sm:h-8 sm:w-8 text-purple-400" />
                 </div>
               </div>
-              <div className="p-4 bg-black/30 rounded-lg border border-white/10">
+              <div className="p-2 sm:p-4 bg-black/30 rounded-lg border border-white/10">
                 <div className="flex items-center justify-between">
                   <div>
-                    <div className="text-gray-400 text-sm">Satisfaction</div>
-                    <div className="text-2xl font-bold text-white">{selectedTeamData.satisfaction}</div>
+                    <div className="text-gray-400 text-xs sm:text-sm">Satisfaction</div>
+                    <div className="text-lg sm:text-2xl font-bold text-white">{selectedTeamData.satisfaction}</div>
                   </div>
-                  <Award className="h-8 w-8 text-yellow-400" />
+                  <Award className="h-5 w-5 sm:h-8 sm:w-8 text-yellow-400" />
                 </div>
               </div>
             </div>
 
             {/* Team Members */}
             <div>
-              <h3 className="text-white font-semibold mb-4 flex items-center">
-                <Users className="h-4 w-4 mr-2 text-purple-400" />
+              <h3 className="text-white font-semibold mb-3 sm:mb-4 flex items-center text-sm sm:text-base">
+                <Users className="h-3 w-3 sm:h-4 sm:w-4 mr-2 text-purple-400" />
                 Team Members ({selectedTeamData.members.length})
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
                 {selectedTeamData.members.map((member, index) => (
-                  <div key={index} className="p-3 bg-black/30 rounded-lg border border-white/10 hover:border-white/20 transition-colors">
-                    <div className="flex items-center space-x-3">
-                      <Avatar className="w-10 h-10">
+                  <div key={index} className="p-2 sm:p-3 bg-black/30 rounded-lg border border-white/10 hover:border-white/20 transition-colors">
+                    <div className="flex items-center space-x-2 sm:space-x-3">
+                      <Avatar className="w-8 h-8 sm:w-10 sm:h-10">
                         <AvatarImage src={member.avatar} />
-                        <AvatarFallback>{member.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
+                        <AvatarFallback className="text-xs sm:text-sm">{member.name.split(' ').map(n => n[0]).join('')}</AvatarFallback>
                       </Avatar>
-                      <div>
-                        <div className="text-white font-medium">{member.name}</div>
-                        <div className="text-gray-400 text-sm">{member.role}</div>
+                      <div className="min-w-0 flex-1">
+                        <div className="text-white font-medium text-sm sm:text-base truncate">{member.name}</div>
+                        <div className="text-gray-400 text-xs sm:text-sm truncate">{member.role}</div>
                       </div>
                     </div>
                   </div>
@@ -435,10 +437,10 @@ export function GovTeamManagement() {
 
             {/* Specialties */}
             <div>
-              <h3 className="text-white font-semibold mb-3">Team Specialties</h3>
-              <div className="flex flex-wrap gap-2">
+              <h3 className="text-white font-semibold mb-3 text-sm sm:text-base">Team Specialties</h3>
+              <div className="flex flex-wrap gap-1 sm:gap-2">
                 {selectedTeamData.specialties.map((specialty, index) => (
-                  <Badge key={index} className="bg-indigo-500/20 text-indigo-300 border-indigo-500/30">
+                  <Badge key={index} className="text-xs bg-indigo-500/20 text-indigo-300 border-indigo-500/30">
                     {specialty}
                   </Badge>
                 ))}

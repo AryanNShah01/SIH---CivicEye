@@ -21,8 +21,6 @@ import {
 } from "lucide-react";
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-
-// ✅ Fix Leaflet marker icons
 import "leaflet-defaulticon-compatibility";
 import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css";
 
@@ -41,7 +39,6 @@ const priorityLevels = [
   { id: "urgent", name: "Urgent", color: "bg-purple-500/20 text-purple-300 border-purple-500/30" },
 ];
 
-// Component to pick location by clicking on map
 function LocationMarker({ onSelect }: { onSelect: (lat: number, lng: number) => void }) {
   useMapEvents({
     click(e) {
@@ -67,7 +64,11 @@ export function UserReportIssue() {
   const recognitionRef = useRef<any>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  // ✅ Initialize speech recognition
+  // Camera state
+  const [cameraOpen, setCameraOpen] = useState(false);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+
+  // Initialize speech recognition
   useEffect(() => {
     if ("webkitSpeechRecognition" in window) {
       const SpeechRecognition =
@@ -124,11 +125,39 @@ export function UserReportIssue() {
     }));
   };
 
-  const openCamera = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.setAttribute("capture", "environment"); // rear camera
-      fileInputRef.current.click();
+  // Camera functions
+  const openCamera = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.play();
+      }
+      setCameraOpen(true);
+    } catch (err) {
+      alert("Camera access denied or not supported.");
     }
+  };
+
+  const takeSnapshot = () => {
+    if (!videoRef.current) return;
+    const canvas = document.createElement("canvas");
+    canvas.width = videoRef.current.videoWidth;
+    canvas.height = videoRef.current.videoHeight;
+    const ctx = canvas.getContext("2d");
+    ctx?.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
+    const imgData = canvas.toDataURL("image/png");
+    setFormData((prev) => ({ ...prev, images: [...prev.images, imgData] }));
+    stopCamera();
+  };
+
+  const stopCamera = () => {
+    if (videoRef.current && videoRef.current.srcObject) {
+      const stream = videoRef.current.srcObject as MediaStream;
+      stream.getTracks().forEach((track) => track.stop());
+      videoRef.current.srcObject = null;
+    }
+    setCameraOpen(false);
   };
 
   const nextStep = () => {
@@ -266,7 +295,7 @@ export function UserReportIssue() {
                 </Label>
                 <div className="h-64 mt-2 rounded-lg overflow-hidden border border-white/20">
                   <MapContainer
-                    center={[20.5937, 78.9629]} // India default
+                    center={[20.5937, 78.9629]}
                     zoom={5}
                     style={{ height: "100%", width: "100%" }}
                   >
@@ -317,6 +346,18 @@ export function UserReportIssue() {
                   onChange={(e) => handleFileUpload(e.target.files)}
                   className="hidden"
                 />
+
+                {/* Camera overlay */}
+                {cameraOpen && (
+                  <div className="fixed inset-0 bg-black/80 flex flex-col items-center justify-center z-50">
+                    <video ref={videoRef} className="w-96 h-72 rounded-lg" />
+                    <div className="mt-4 flex gap-4">
+                      <Button onClick={takeSnapshot}>Capture</Button>
+                      <Button onClick={stopCamera} variant="outline">Cancel</Button>
+                    </div>
+                  </div>
+                )}
+
                 <div className="flex flex-wrap gap-3 mt-3">
                   {formData.images.map((img, idx) => (
                     <div
@@ -345,18 +386,10 @@ export function UserReportIssue() {
           {currentStep === 4 && (
             <div className="space-y-6 text-white">
               <h2 className="text-2xl font-bold">Review & Submit</h2>
-              <p>
-                <b>Title:</b> {formData.title}
-              </p>
-              <p>
-                <b>Description:</b> {formData.description}
-              </p>
-              <p>
-                <b>Category:</b> {formData.category}
-              </p>
-              <p>
-                <b>Priority:</b> {formData.priority}
-              </p>
+              <p><b>Title:</b> {formData.title}</p>
+              <p><b>Description:</b> {formData.description}</p>
+              <p><b>Category:</b> {formData.category}</p>
+              <p><b>Priority:</b> {formData.priority}</p>
               <p>
                 <b>Location:</b>{" "}
                 {formData.lat && formData.lng
