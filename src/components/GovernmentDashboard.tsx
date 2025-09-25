@@ -64,8 +64,8 @@ export function GovernmentDashboard({ onSwitchDashboard, isDarkMode, onToggleDar
           }`}
         >
           <div className="container mx-auto px-4 sm:px-6 py-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
+            <div className="flex items-center justify-between flex-wrap gap-2">
+              <div className="flex items-center space-x-4 flex-wrap gap-2">
                 <div className="flex items-center space-x-3">
                   {/* Logo */}
                   <div className="relative">
@@ -109,7 +109,7 @@ export function GovernmentDashboard({ onSwitchDashboard, isDarkMode, onToggleDar
                 </div>
               </div>
               
-              <div className="flex items-center space-x-2 sm:space-x-4">
+              <div className="flex items-center space-x-2 sm:space-x-4 flex-nowrap overflow-x-auto pb-1">
                 <div
                   className={`hidden lg:flex items-center space-x-2 px-3 py-1 rounded-lg ${
                     isDarkMode
@@ -124,7 +124,7 @@ export function GovernmentDashboard({ onSwitchDashboard, isDarkMode, onToggleDar
                 </div>
                 
                 {/* Language Toggle */}
-                <LanguageToggle />
+                <LanguageToggle isDarkMode={isDarkMode} />
                 
                 {/* Dark mode toggle */}
                 <Button
