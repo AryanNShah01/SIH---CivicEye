@@ -23,6 +23,8 @@ import {
   Instagram,
   Linkedin,
   Heart,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { UserHome } from "./user-tabs/UserHome";
 import { UserAnalytics } from "./user-tabs/UserAnalytics";
@@ -69,7 +71,7 @@ export function UserDashboard({
 
       {/* Main Container */}
       <div className="relative z-10 min-h-screen flex flex-col">
-        {/* Header */}
+        {/* Header - Fixed for mobile scrolling */}
         <header
           className={`glass-card border-b sticky top-0 z-50 ${
             isDarkMode
@@ -77,121 +79,144 @@ export function UserDashboard({
               : "bg-white border-gray-200 text-black shadow-md"
           }`}
         >
-          <div className="container mx-auto px-4 sm:px-6 py-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <div className="flex items-center space-x-3">
-                  {/* Logo */}
-                  <div className="flex items-center justify-center neon-glow-hover transition-all duration-300 hover:scale-110 relative">
-                    <img src={logo} alt="Logo" className="h-8 w-8 object-contain" />
-                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
-                  </div>
-
-                  <div>
-                    <h1 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
-                      CivicEye
-                    </h1>
-                    <p className="text-xs hidden sm:block">
-                      Mumbai Smart City Initiative
-                    </p>
-                  </div>
+          <div className="container mx-auto px-4 sm:px-6 py-3 sm:py-4">
+            {/* Top Row - Logo and Main Info */}
+            <div className="flex items-center justify-between mb-2 sm:mb-0">
+              <div className="flex items-center space-x-3">
+                {/* Logo */}
+                <div className="flex items-center justify-center neon-glow-hover transition-all duration-300 hover:scale-110 relative">
+                  <img src={logo} alt="Logo" className="h-8 w-8 object-contain" />
+                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
                 </div>
 
-                <div className="flex items-center space-x-2">
-                  <Badge
-                    className={`text-xs ${
-                      isDarkMode
-                        ? "bg-blue-500/20 text-blue-300 border-blue-500/30"
-                        : "bg-blue-100 text-blue-800 border border-blue-200"
-                    }`}
-                  >
-                    <MapPin className="w-3 h-3 mr-1" />
-                    {t.names.areas[0]}
-                  </Badge>
-                  <Badge
-                    className={`text-xs ${
-                      isDarkMode
-                        ? "bg-green-500/20 text-green-300 border-green-500/30"
-                        : "bg-green-100 text-green-800 border border-green-200"
-                    }`}
-                  >
-                    <Star className="w-3 h-3 mr-1" />
-                    Level 5 Citizen
-                  </Badge>
+                <div>
+                  <h1 className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-blue-400 via-purple-400 to-cyan-400 bg-clip-text text-transparent">
+                    CivicEye
+                  </h1>
+                  <p className="text-xs hidden sm:block">
+                    Mumbai Smart City Initiative
+                  </p>
                 </div>
               </div>
 
-              <div className="flex items-center space-x-2 sm:space-x-4">
-                {/* Language Toggle */}
+              {/* Desktop Controls - Hidden on mobile */}
+              <div className="hidden sm:flex items-center space-x-4">
                 <LanguageToggle />
-
-                {/* Dark Mode Toggle */}
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={onToggleDarkMode}
                   className="glass-card transition-all duration-300 hover:scale-105"
                 >
-                  {isDarkMode ? (
-                    <Sun className="h-4 w-4" />
-                  ) : (
-                    <Moon className="h-4 w-4" />
-                  )}
+                  {isDarkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
                 </Button>
-
-                {/* Switch Dashboard */}
                 <Button
                   variant="outline"
                   size="sm"
                   onClick={() => onSwitchDashboard("government")}
-                  className="hidden sm:flex transition-all duration-300 hover:scale-105"
+                  className="transition-all duration-300 hover:scale-105"
                 >
                   <Building2 className="h-4 w-4 mr-2" />
                   {t.switchTo} {t.governmentDashboard}
                 </Button>
                 <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => onSwitchDashboard("government")}
-                  className="sm:hidden transition-all duration-300 hover:scale-105"
-                >
-                  <Building2 className="h-4 w-4" />
-                </Button>
-
-                {/* Logout button */}
-                {/* Logout Button */}
-                {/* <Button
                   variant="destructive"
                   size="sm"
                   onClick={() => {
                     localStorage.removeItem("authToken");
                     sessionStorage.clear();
-                    window.location.href = "/login";
+                    window.location.replace("/");
                   }}
                   className="transition-all duration-300 hover:scale-105 flex items-center gap-2"
                 >
                   <LogOut className="h-4 w-4" />
-                  <span className="hidden sm:inline">Logout</span>
-                </Button> */}
-                
-<Button
-  variant="destructive"
-  size="sm"
-  onClick={() => {
-    localStorage.removeItem("authToken");
-    sessionStorage.clear();
-    // Use window.location.replace instead of href
-    window.location.replace("/");
-    // Or if you have a specific login route configured:
-    // window.location.replace("/login");
-  }}
-  className="transition-all duration-300 hover:scale-105 flex items-center gap-2"
->
-  <LogOut className="h-4 w-4" />
-  <span className="hidden sm:inline">Logout</span>
-</Button>
-
+                  <span>Logout</span>
+                </Button>
               </div>
+            </div>
+
+            {/* Bottom Row - Mobile Badges and Controls */}
+            <div className="flex items-center justify-between sm:hidden">
+              {/* Badges */}
+              <div className="flex items-center space-x-2 flex-1 overflow-x-auto scrollbar-hide">
+                <Badge
+                  className={`text-xs whitespace-nowrap ${
+                    isDarkMode
+                      ? "bg-blue-500/20 text-blue-300 border-blue-500/30"
+                      : "bg-blue-100 text-blue-800 border border-blue-200"
+                  }`}
+                >
+                  <MapPin className="w-3 h-3 mr-1" />
+                  {t.names.areas[0]}
+                </Badge>
+                <Badge
+                  className={`text-xs whitespace-nowrap ${
+                    isDarkMode
+                      ? "bg-green-500/20 text-green-300 border-green-500/30"
+                      : "bg-green-100 text-green-800 border border-green-200"
+                  }`}
+                >
+                  <Star className="w-3 h-3 mr-1" />
+                  Level 5 Citizen
+                </Badge>
+              </div>
+
+              {/* Mobile Controls */}
+              <div className="flex items-center space-x-1 ml-2">
+                <LanguageToggle />
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={onToggleDarkMode}
+                  className="h-8 w-8 p-0 glass-card"
+                >
+                  {isDarkMode ? <Sun className="h-3 w-3" /> : <Moon className="h-3 w-3" />}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => onSwitchDashboard("government")}
+                  className="h-8 w-8 p-0"
+                >
+                  <Building2 className="h-3 w-3" />
+                </Button>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => {
+                    localStorage.removeItem("authToken");
+                    sessionStorage.clear();
+                    window.location.replace("/");
+                  }}
+                  className="h-8 w-8 p-0"
+                >
+                  <LogOut className="h-3 w-3" />
+                </Button>
+              </div>
+            </div>
+
+            {/* Desktop Badges - Hidden on mobile */}
+            <div className="hidden sm:flex items-center space-x-2 mt-2">
+              <Badge
+                className={`text-xs ${
+                  isDarkMode
+                    ? "bg-blue-500/20 text-blue-300 border-blue-500/30"
+                    : "bg-blue-100 text-blue-800 border border-blue-200"
+                }`}
+              >
+                <MapPin className="w-3 h-3 mr-1" />
+                {t.names.areas[0]}
+              </Badge>
+              <Badge
+                className={`text-xs ${
+                  isDarkMode
+                    ? "bg-green-500/20 text-green-300 border-green-500/30"
+                    : "bg-green-100 text-green-800 border border-green-200"
+                }`}
+              >
+                <Star className="w-3 h-3 mr-1" />
+                Level 5 Citizen
+              </Badge>
             </div>
           </div>
         </header>
@@ -230,7 +255,7 @@ export function UserDashboard({
                   <button
                     key={value}
                     onClick={() => setActiveTab(value)}
-                    className={`flex flex-col items-center justify-center min-w-[80px] p-3 rounded-lg transition-all duration-300 ${
+                    className={`flex flex-col items-center justify-center min-w-[80px] p-3 rounded-lg transition-all duration-300 flex-shrink-0 ${
                       activeTab === value
                         ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white"
                         : isDarkMode
